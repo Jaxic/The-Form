@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Input Form</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <h1>Content Details Input</h1>
+
+        <!-- Authentication Gate is completely removed -->
+
+        <!-- Main Form (Visible by Default) -->
+        <form id="content-form">
+            <div class="form-group">
+                <label for="keyword">Keyword:</label>
+                <input type="text" id="keyword" name="keyword" required>
+            </div>
+
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+
+            <div class="form-group">
+                <label for="productUrl">Product 1 URL:</label>
+                <input type="url" id="productUrl" name="productUrl" placeholder="https://example.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="articleType">Article Type:</label>
+                <select id="articleType" name="articleType" required>
+                    <option value="" disabled selected>-- Select Type --</option>
+                    <option value="Step-by-Step">Step-by-Step</option>
+                    <option value="Verses">Verses</option>
+                    <option value="Does">Does</option>
+                    <option value="Is/Are/Can">Is/Are/Can</option>
+                    <option value="What Does">What Does</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="user">User:</label>
+                <input type="text" id="user" name="user" required>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" id="submit-button">Submit</button>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" style="display: none;">
+                <div class="spinner"></div>
+                Processing...
+            </div>
+
+            <!-- Status Message Area -->
+            <div id="status-message"></div>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

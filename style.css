@@ -1,0 +1,209 @@
+/* Basic Reset & Body Styling */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f7f9;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align top */
+    min-height: 100vh;
+    padding: 40px 20px; /* Add horizontal padding too */
+    color: #333;
+}
+
+/* Container Styling */
+.app-container {
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px; /* Limit form width */
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 25px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Authentication Gate Styling */
+#auth-gate {
+    margin-bottom: 20px;
+}
+
+#auth-gate p {
+    margin-bottom: 10px;
+}
+
+#auth-gate input[type="password"] {
+    width: calc(100% - 22px); /* Adjust for padding/border */
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+#auth-button {
+     background-color: #3498db; /* Blue */
+     color: white;
+     padding: 10px 20px;
+     border: none;
+     border-radius: 4px;
+     cursor: pointer;
+     font-size: 1rem;
+     transition: background-color 0.2s ease;
+}
+
+#auth-button:hover {
+     background-color: #2980b9; /* Darker Blue */
+}
+
+/* Form Group Styling */
+.form-group {
+    margin-bottom: 20px;
+    text-align: left; /* Align labels left */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-group input[type="text"],
+.form-group input[type="url"],
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: #fdfdfd;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #3498db; /* Highlight focus */
+    outline: none;
+}
+
+/* Specific styles for dropdown */
+.form-group select {
+    appearance: none; /* Remove default arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); /* Custom arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 1.2em;
+    padding-right: 30px; /* Space for custom arrow */
+}
+
+/* Submit Button */
+#submit-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #2ecc71; /* Green */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+#submit-button:hover {
+    background-color: #27ae60; /* Darker Green */
+}
+
+#submit-button:disabled {
+    background-color: #95a5a6; /* Grey when disabled */
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Loading Indicator */
+#loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border-left-color: #3498db; /* Blue spinner */
+    animation: spin 1s ease infinite;
+    margin-right: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Status Message Area */
+#status-message {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    text-align: center;
+    display: none; /* Hidden by default */
+}
+
+.success-message {
+    background-color: #e8f5e9; /* Light Green */
+    color: #2e7d32; /* Dark Green */
+    border: 1px solid #a5d6a7;
+}
+
+.error-message {
+    background-color: #ffebee; /* Light Red */
+    color: #c62828; /* Dark Red */
+    border: 1px solid #ef9a9a;
+}
+
+/* Styling for the raw response output */
+#status-message pre {
+    background-color: #eee; /* Light grey background */
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 8px;
+    white-space: pre-wrap; /* Wrap long lines */
+    word-wrap: break-word; /* Break long words/URLs */
+    text-align: left; /* Align text left within the pre block */
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; /* Monospace font */
+    font-size: 0.9em;
+    max-height: 200px; /* Limit height and add scroll if needed */
+    overflow-y: auto; /* Add vertical scrollbar if content overflows */
+    border: 1px solid #ddd;
+    color: #333; /* Ensure text color is readable */
+}
+
+/* Slightly different background for success/error pre */
+.success-message pre {
+    background-color: #dff0d8; /* Lighter green */
+     border-color: #c1e7c1;
+}
+
+.error-message pre {
+    background-color: #f2dede; /* Lighter red */
+    border-color: #ebcccc;
+}
