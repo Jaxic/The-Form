@@ -207,3 +207,21 @@ h1 {
     background-color: #f2dede; /* Lighter red */
     border-color: #ebcccc;
 }
+
+#status-message.success {
+    color: green;
+    background-color: #e6ffe6;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid green;
+    border-radius: 5px;
+}
+
+#status-message.error {
+    color: red;
+    background-color: #ffe6e6;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid red;
+    border-radius: 5px;
+}
