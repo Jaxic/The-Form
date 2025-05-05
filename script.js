@@ -1,4 +1,3 @@
-// Add this flag at the top of your DOMContentLoaded event handler
 document.addEventListener('DOMContentLoaded', () => {
     // --- Configuration ---
     const WEBHOOK_URL = 'https://polished-polite-blowfish.ngrok-free.app/webhook/feadab27-dddf-4b36-8d41-b2b06bc30d24';
@@ -16,21 +15,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitButton = document.getElementById('submit-button');
     const loadingIndicator = document.getElementById('loading-indicator');
     
-    // Form submission logic with debounce protection
+    // Form submission logic
     contentForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         
-        // Prevent duplicate submissions
+        // Prevent duplicate submissions (debounce)
         if (isSubmitting) {
             console.log("Form submission already in progress, ignoring this click");
-            displayMessage("A submission is already in progress. Please wait for it to complete (approximately 5 minutes).", 'error');
             return;
         }
         
-        // Set the debounce flag immediately
+        // Set the flag immediately
         isSubmitting = true;
         
-        // UI reset and preparation
+        // Clear previous messages
         const statusMessage = document.getElementById('status-message');
         if (statusMessage) {
             statusMessage.textContent = '';
@@ -38,49 +36,78 @@ document.addEventListener('DOMContentLoaded', () => {
             statusMessage.className = '';
         }
         
-        // Validation code (same as your original)
+        // Basic validation (your existing validation code here)
         // ...
-
-        // Show loading & disable button
+        
+        // Prepare data
+        const formData = {
+            keyword: keywordInput.value.trim(),
+            title: titleInput.value.trim(),
+            productUrl: productUrlInput.value.trim(),
+            articleType: articleTypeSelect.value,
+            user: userInput.value.trim()
+        };
+        
+        // Show "Processing" message and disable submit button
+        displayMessage("Processing, please wait", 'success');
         loadingIndicator.style.display = 'flex';
         submitButton.disabled = true;
-        submitButton.textContent = 'Processing (approx. 5 min)...';
+        submitButton.textContent = 'Processing...';
         
         // Send to webhook
-        let responseBody = '';
         try {
             const response = await fetch(WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-                // Set a longer timeout to accommodate your workflow
-                // Note: This is not standard fetch() but shows intent
+                body: JSON.stringify(formData)
             });
-
+            
+            let responseBody = '';
             try {
                 responseBody = await response.text();
             } catch (bodyError) {
                 console.warn("Could not read response body:", bodyError);
                 responseBody = "[Could not read response body]";
             }
-
+            
+            // Handle the response
             if (response.ok) {
-                // Success handling
-                displayMessage(
-                    `Form submitted successfully! (Status: ${response.status})<br><br><strong>Webhook Response:</strong><pre>${escapeHtml(responseBody)}</pre>`,
-                    'success'
-                );
-                contentForm.reset();
-                keywordInput.focus();
+                if (responseBody.trim().toUpperCase().startsWith('FAILURE')) {
+                    displayMessage(
+                        `<pre>${escapeHtml(responseBody)}</pre>`,
+                        'error'
+                    );
+                } else {
+                    displayMessage(
+                        `Form submitted successfully! (Status: ${response.status})<br><br><strong>Webhook Response:</strong><pre>${escapeHtml(responseBody)}</pre>`,
+                        'success'
+                    );
+                    contentForm.reset();
+                    keywordInput.focus();
+                }
             } else {
-                // Error handling
                 displayMessage(
                     `Submission failed (HTTP Error): ${response.status} ${response.statusText}.<br><br><strong>Webhook Response:</strong><pre>${escapeHtml(responseBody)}</pre>`,
                     'error'
                 );
             }
         } catch (error) {
-            // Network error handling
             console.error('Network or fetch error:', error);
-            displayMessage(`A network error occurred: ${error.message}. <br> Your submission may still be processing. Please wait before submitting again.`, 'error');
-        } finally
+            displayMessage(
+                `A network error occurred: ${error.message}.<br>Your request might still be processing despite this error.`,
+                'error'
+            );
+        } finally {
+            // Hide loading indicator
+            loadingIndicator.style.display = 'none';
+            
+            // Re-enable the form
+            submitButton.disabled = false;
+            submitButton.textContent = 'Submit';
+            isSubmitting = false;
+        }
+    });
+
+    // Focus the first field
+    keywordInput.focus();
+});
