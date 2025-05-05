@@ -5,62 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Content Input Form</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Add Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="app-container">
         <h1>Content Details Input</h1>
 
-        <!-- Authentication Gate is completely removed -->
+        <div class="layout-container">
+            <!-- Form Column -->
+            <div class="form-column">
+                <form id="content-form">
+                    <div class="form-group">
+                        <label for="keyword">Keyword:</label>
+                        <input type="text" id="keyword" name="keyword" required>
+                    </div>
 
-        <!-- Main Form (Visible by Default) -->
-        <form id="content-form">
-            <div class="form-group">
-                <label for="keyword">Keyword:</label>
-                <input type="text" id="keyword" name="keyword" required>
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productUrl">Product 1 URL:</label>
+                        <input type="url" id="productUrl" name="productUrl" placeholder="https://example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="articleType">Article Type:</label>
+                        <select id="articleType" name="articleType" required>
+                            <option value="" disabled selected>-- Select Type --</option>
+							<option value="Step-What/Why/How">Step-What/Why/How</option>
+                            <option value="Step-by-Step">Step-by-Step</option>
+                            <option value="Verses">Verses</option>
+                            <option value="Does">Does</option>
+                            <option value="Is/Are/Can">Is/Are/Can</option>
+                            <option value="What Does">What Does</option>
+                            <option value="5 Reasons">5 Reasons</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="user">User:</label>
+                        <input type="text" id="user" name="user" required>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" id="submit-button">Submit</button>
+                    </div>
+
+                    <!-- Loading Indicator -->
+                    <div id="loading-indicator" style="display: none;">
+                        <div class="spinner"></div>
+                        Processing...
+                    </div>
+
+                    <!-- Status Message Area -->
+                    <div id="status-message"></div>
+                </form>
             </div>
-
-            <div class="form-group">
-                <label for="title">Title:</label>
-                <input type="text" id="title" name="title" required>
+            
+            <!-- Format Info Column -->
+            <div class="info-column">
+                <div id="format-info" class="format-info-container">
+                    <div class="format-header">
+                        <h3>Article Format</h3>
+                        <div class="format-badge">Reference</div>
+                    </div>
+                    
+                    <div class="format-content">
+                        <p class="info-select-prompt">Please select an article type to view its structure</p>
+                        <!-- Format details will be inserted here by JavaScript -->
+                    </div>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="productUrl">Product 1 URL:</label>
-                <input type="url" id="productUrl" name="productUrl" placeholder="https://example.com" required>
-            </div>
-
-            <div class="form-group">
-                <label for="articleType">Article Type:</label>
-                <select id="articleType" name="articleType" required>
-                    <option value="" disabled selected>-- Select Type --</option>
-                    <option value="Step-What/Why/How">Step-What/Why/How</option>
-                    <option value="Step-by-Step">Step-by-Step</option>
-                    <option value="Verses">Verses</option>
-                    <option value="Does">Does</option>
-                    <option value="Is/Are/Can">Is/Are/Can</option>
-                    <option value="What Does">What Does</option>
-                    <option value="5 Reasons">5 Reasons</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="user">User:</label>
-                <input type="text" id="user" name="user" required>
-            </div>
-
-            <div class="form-group">
-                <button type="submit" id="submit-button">Submit</button>
-            </div>
-
-            <!-- Loading Indicator -->
-            <div id="loading-indicator" style="display: none;">
-                <div class="spinner"></div>
-                Processing...
-            </div>
-
-            <!-- Status Message Area -->
-            <div id="status-message"></div>
-        </form>
+        </div>
     </div>
 
     <script src="script.js"></script>
