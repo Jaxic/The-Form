@@ -1,4 +1,6 @@
-/* Basic Reset & Body Styling */
+/* Add these modern styles to your existing CSS */
+
+/* Base updates */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -6,151 +8,306 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f4f7f9;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f0f2f5;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Align top */
+    align-items: flex-start;
     min-height: 100vh;
-    padding: 40px 20px; /* Add horizontal padding too */
+    padding: 40px 20px;
     color: #333;
+    line-height: 1.5;
 }
 
-/* Container Styling */
 .app-container {
     background-color: #ffffff;
-    padding: 30px 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
     width: 100%;
-    max-width: 500px; /* Limit form width */
-    text-align: center;
+    max-width: 1000px;
 }
 
 h1 {
     margin-bottom: 25px;
-    color: #2c3e50;
-    font-weight: 600;
+    color: #1a1a2e;
+    font-weight: 700;
+    text-align: center;
 }
 
-/* Authentication Gate Styling */
-#auth-gate {
-    margin-bottom: 20px;
+/* Updated two-column layout */
+.layout-container {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    align-items: stretch;
 }
 
-#auth-gate p {
-    margin-bottom: 10px;
+.form-column {
+    flex: 1;
+    min-width: 0;
 }
 
-#auth-gate input[type="password"] {
-    width: calc(100% - 22px); /* Adjust for padding/border */
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
+.info-column {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
 }
 
-#auth-button {
-     background-color: #3498db; /* Blue */
-     color: white;
-     padding: 10px 20px;
-     border: none;
-     border-radius: 4px;
-     cursor: pointer;
-     font-size: 1rem;
-     transition: background-color 0.2s ease;
-}
-
-#auth-button:hover {
-     background-color: #2980b9; /* Darker Blue */
-}
-
-/* Form Group Styling */
+/* Modern Form Styling */
 .form-group {
-    margin-bottom: 20px;
-    text-align: left; /* Align labels left */
+    margin-bottom: 24px;
+    text-align: left;
 }
 
 .form-group label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #555;
+    color: #4a5568;
+    font-size: 0.95rem;
 }
 
 .form-group input[type="text"],
 .form-group input[type="url"],
 .form-group select {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
     font-size: 1rem;
-    background-color: #fdfdfd;
-    transition: border-color 0.2s ease;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    color: #1a202c;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .form-group input:focus,
 .form-group select:focus {
-    border-color: #3498db; /* Highlight focus */
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
     outline: none;
 }
 
-/* Specific styles for dropdown */
+/* Updated dropdown styling */
 .form-group select {
-    appearance: none; /* Remove default arrow */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); /* Custom arrow */
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%234a5568" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
     background-repeat: no-repeat;
-    background-position: right 10px center;
+    background-position: right 12px center;
     background-size: 1.2em;
-    padding-right: 30px; /* Space for custom arrow */
+    padding-right: 40px;
 }
 
-/* Submit Button */
 #submit-button {
     width: 100%;
-    padding: 12px;
-    background-color: #2ecc71; /* Green */
+    padding: 14px;
+    background-color: #3182ce;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
-    transition: background-color 0.2s ease, opacity 0.2s ease;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 #submit-button:hover {
-    background-color: #27ae60; /* Darker Green */
+    background-color: #2c5282;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 #submit-button:disabled {
-    background-color: #95a5a6; /* Grey when disabled */
+    background-color: #a0aec0;
     cursor: not-allowed;
     opacity: 0.7;
+    transform: none;
+    box-shadow: none;
 }
 
-/* Loading Indicator */
+/* Modern Format Info Styling */
+.format-info-container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid #e2e8f0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.format-header {
+    background-color: #f8fafc;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.format-header h3 {
+    margin: 0;
+    color: #2d3748;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.format-badge {
+    background-color: #ebf4ff;
+    color: #3182ce;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.format-content {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.info-select-prompt {
+    color: #718096;
+    font-size: 0.95rem;
+    text-align: center;
+    margin: 30px 0;
+}
+
+.format-type-title {
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #3182ce;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 12px;
+}
+
+/* Modern list styling */
+.format-sections {
+    list-style-type: none;
+    counter-reset: section-counter;
+    margin: 0;
+    padding: 0;
+}
+
+.format-sections li {
+    position: relative;
+    padding: 12px 12px 12px 45px;
+    margin-bottom: 8px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.format-sections li:hover {
+    background-color: #edf2f7;
+}
+
+.format-sections li::before {
+    content: counter(section-counter);
+    counter-increment: section-counter;
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background-color: #3182ce;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.format-note {
+    margin-top: 20px;
+    padding: 12px 16px;
+    background-color: #ebf8ff;
+    border-left: 3px solid #4299e1;
+    border-radius: 6px;
+    color: #2c5282;
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+    .layout-container {
+        flex-direction: column;
+    }
+    
+    .info-column, .form-column {
+        width: 100%;
+    }
+    
+    .format-info-container {
+        margin-top: 30px;
+    }
+}
+
+/* Loading indicator updates */
 #loading-indicator {
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 15px;
     font-size: 0.9rem;
-    color: #555;
+    color: #4a5568;
 }
 
 .spinner {
-    border: 4px solid rgba(0, 0, 0, 0.1);
+    border: 3px solid rgba(0, 0, 0, 0.1);
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    border-left-color: #3498db; /* Blue spinner */
+    border-left-color: #3182ce;
     animation: spin 1s ease infinite;
     margin-right: 10px;
+}
+
+/* Status message updates */
+#status-message {
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-align: center;
+    display: none;
+}
+
+.success-message {
+    background-color: #f0fff4;
+    color: #276749;
+    border: 1px solid #c6f6d5;
+}
+
+.error-message {
+    background-color: #fff5f5;
+    color: #c53030;
+    border: 1px solid #fed7d7;
+}
+
+#status-message pre {
+    background-color: #f7fafc;
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 10px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    text-align: left;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.85em;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #edf2f7;
+    color: #2d3748;
 }
 
 @keyframes spin {
@@ -158,70 +315,24 @@ h1 {
     100% { transform: rotate(360deg); }
 }
 
-/* Status Message Area */
-#status-message {
-    margin-top: 20px;
-    padding: 12px;
-    border-radius: 4px;
-    font-weight: 500;
-    text-align: center;
+.spinner {
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border-left-color: #3182ce; /* Blue spinner */
+    animation: spin 1s linear infinite; /* Changed to linear for smoother rotation */
+    margin-right: 10px;
+    display: inline-block; /* Ensure proper display */
+}
+
+/* Make sure the loading indicator is properly displayed */
+#loading-indicator {
     display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #4a5568;
 }
 
-.success-message {
-    background-color: #e8f5e9; /* Light Green */
-    color: #2e7d32; /* Dark Green */
-    border: 1px solid #a5d6a7;
-}
-
-.error-message {
-    background-color: #ffebee; /* Light Red */
-    color: #c62828; /* Dark Red */
-    border: 1px solid #ef9a9a;
-}
-
-/* Styling for the raw response output */
-#status-message pre {
-    background-color: #eee; /* Light grey background */
-    padding: 10px;
-    border-radius: 4px;
-    margin-top: 8px;
-    white-space: pre-wrap; /* Wrap long lines */
-    word-wrap: break-word; /* Break long words/URLs */
-    text-align: left; /* Align text left within the pre block */
-    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; /* Monospace font */
-    font-size: 0.9em;
-    max-height: 200px; /* Limit height and add scroll if needed */
-    overflow-y: auto; /* Add vertical scrollbar if content overflows */
-    border: 1px solid #ddd;
-    color: #333; /* Ensure text color is readable */
-}
-
-/* Slightly different background for success/error pre */
-.success-message pre {
-    background-color: #dff0d8; /* Lighter green */
-     border-color: #c1e7c1;
-}
-
-.error-message pre {
-    background-color: #f2dede; /* Lighter red */
-    border-color: #ebcccc;
-}
-
-#status-message.success {
-    color: green;
-    background-color: #e6ffe6;
-    padding: 10px;
-    margin-top: 10px;
-    border: 1px solid green;
-    border-radius: 5px;
-}
-
-#status-message.error {
-    color: red;
-    background-color: #ffe6e6;
-    padding: 10px;
-    margin-top: 10px;
-    border: 1px solid red;
-    border-radius: 5px;
-}
