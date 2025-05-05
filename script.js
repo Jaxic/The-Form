@@ -10,18 +10,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const userInput = document.getElementById('user');
     const submitButton = document.getElementById('submit-button');
     const loadingIndicator = document.getElementById('loading-indicator');
+    const statusMessage = document.getElementById('status-message');
 
     contentForm.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         if (isSubmitting) {
-            displayMessage("A submission is already in progress. Please wait for it to complete.", 'error');
             return;
         }
 
         isSubmitting = true;
-
-        const statusMessage = document.getElementById('status-message');
         statusMessage.textContent = '';
         statusMessage.style.display = 'none';
         statusMessage.className = '';
@@ -50,29 +48,18 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 responseBody = await response.text();
             } catch (bodyError) {
-                console.warn("Could not read response body:", bodyError);
-                responseBody = "[Could not read response body]";
+                responseBody = '';
             }
 
             if (response.ok) {
-                displayMessage(
-                    `✅ Form submitted successfully! (Status: ${response.status})<br><br><strong>Webhook Response:</strong><pre>${escapeHtml(responseBody)}</pre>`,
-                    'success'
-                );
+                displayMessage(escapeHtml(responseBody), 'success');
                 contentForm.reset();
                 keywordInput.focus();
             } else {
-                displayMessage(
-                    `❌ Submission failed (HTTP Error): ${response.status} ${response.statusText}.<br><br><strong>Webhook Response:</strong><pre>${escapeHtml(responseBody)}</pre>`,
-                    'error'
-                );
+                displayMessage(escapeHtml(responseBody || 'An error occurred.'), 'error');
             }
         } catch (error) {
-            console.error('Network or fetch error:', error);
-            displayMessage(
-                `❌ A network error occurred: ${error.message}.<br>Please wait before trying again.`,
-                'error'
-            );
+            displayMessage('Network error. Please try again later.', 'error');
         } finally {
             isSubmitting = false;
             loadingIndicator.style.display = 'none';
@@ -82,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function displayMessage(message, type) {
-        const statusMessage = document.getElementById('status-message');
         statusMessage.innerHTML = message;
         statusMessage.style.display = 'block';
         statusMessage.className = type;
