@@ -1,11 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Configuration ---
+    // Replace with your actual webhook URL
     const WEBHOOK_URL = 'https://polished-polite-blowfish.ngrok-free.app/webhook/feadab27-dddf-4b36-8d41-b2b06bc30d24';
     
-    // Add this debounce flag and a timestamp for last submission
+    // Only track if a submission is in progress - no time restrictions
     let isSubmitting = false;
-    let lastSubmissionTime = 0;
-    const MIN_SUBMISSION_INTERVAL = 10 * 60 * 1000; // 10 minutes in milliseconds
+    
+    // Enable logging for debugging
+    console.log("Content form script loaded successfully");
     
     // Format information for each article type
     const formatInfo = {
@@ -133,6 +135,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingIndicator = document.getElementById('loading-indicator');
     const formatInfoContainer = document.getElementById('format-info');
     
+    // Check if elements were found
+    if (!contentForm || !submitButton || !loadingIndicator) {
+        console.error('Critical DOM elements are missing!');
+        return; // Exit to prevent errors
+    }
+    
     // Helper function to escape HTML
     function escapeHtml(str) {
         return str
@@ -200,6 +208,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to display status messages
     function displayMessage(message, type) {
         const statusMessage = document.getElementById('status-message');
+        if (!statusMessage) {
+            console.error('Status message element not found!');
+            return;
+        }
+        
         statusMessage.style.display = 'block';
         statusMessage.className = '';
         
@@ -224,12 +237,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Form submission logic with enhanced protection
+    // Clear any potential leftover error messages on page load
+    window.addEventListener('load', () => {
+        const statusMessage = document.getElementById('status-message');
+        if (statusMessage) {
+            statusMessage.textContent = '';
+            statusMessage.style.display = 'none';
+        }
+    });
+    
+    // Form submission logic with simple in-progress protection
     contentForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-        
-        const currentTime = Date.now();
-        const timeSinceLastSubmission = currentTime - lastSubmissionTime;
+        console.log("Form submission triggered");
         
         // Check if we're already processing a submission
         if (isSubmitting) {
@@ -238,32 +258,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // Check if minimum interval has elapsed since last submission
-        if (lastSubmissionTime > 0 && timeSinceLastSubmission < MIN_SUBMISSION_INTERVAL) {
-            const minutesRemaining = Math.ceil((MIN_SUBMISSION_INTERVAL - timeSinceLastSubmission) / 60000);
-            console.log(`Minimum submission interval not reached. Please wait ${minutesRemaining} more minutes.`);
-            displayMessage(`Please wait approximately ${minutesRemaining} more minute${minutesRemaining !== 1 ? 's' : ''} before submitting again to avoid duplicate processing.`, 'error');
-            return;
-        }
-        
-        // Set the debounce flag immediately and update last submission time
+        // Set the debounce flag immediately
         isSubmitting = true;
-        lastSubmissionTime = currentTime;
-        
-        // Store submission data in localStorage as a backup
-        try {
-            const formData = {
-                keyword: keywordInput.value.trim(),
-                title: titleInput.value.trim(),
-                productUrl: productUrlInput.value.trim(),
-                articleType: articleTypeSelect.value,
-                user: userInput.value.trim(),
-                timestamp: currentTime
-            };
-            localStorage.setItem('lastFormSubmission', JSON.stringify(formData));
-        } catch (e) {
-            console.warn("Could not save form data to localStorage:", e);
-        }
         
         // UI reset and preparation
         const statusMessage = document.getElementById('status-message');
@@ -282,22 +278,37 @@ document.addEventListener('DOMContentLoaded', () => {
             user: userInput.value.trim()
         };
         
-        // Show loading & disable button
+        // Show loading & disable button - FIX for button text overflow
         loadingIndicator.style.display = 'flex';
         submitButton.disabled = true;
-        submitButton.textContent = 'Processing (approx. 5 min)...';
         
-        // Send to webhook
-        let responseBody = '';
+        // Store original button text
+        const originalButtonText = submitButton.textContent || 'Submit';
+        
+        // Update button text (fixed to prevent overflow)
+        submitButton.textContent = 'Processing...';
+        
+        // GitHub Pages CORS fix - add proper headers and error handling
         try {
+            console.log('Sending data to webhook:', WEBHOOK_URL);
             const response = await fetch(WEBHOOK_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    // Add CORS headers
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type'
+                },
                 body: JSON.stringify(formData),
+                // Add mode for CORS
+                mode: 'cors'
             });
 
+            let responseBody = '';
             try {
                 responseBody = await response.text();
+                console.log('Received response:', responseBody);
             } catch (bodyError) {
                 console.warn("Could not read response body:", bodyError);
                 responseBody = "[Could not read response body]";
@@ -323,41 +334,34 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             // Network error handling
             console.error('Network or fetch error:', error);
-            displayMessage(`A network error occurred: ${error.message}. <br> Your submission may still be processing. Please wait before submitting again.`, 'error');
+            
+            // Improved error handling for GitHub Pages CORS issues
+            if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+                displayMessage(`
+                    <strong>CORS Error:</strong> The browser blocked the request due to cross-origin restrictions. 
+                    <br><br>
+                    This is likely because GitHub Pages cannot directly communicate with your webhook. 
+                    <br><br>
+                    Possible solutions:
+                    <ul>
+                        <li>Configure your webhook server to allow requests from your GitHub Pages domain</li>
+                        <li>Use a CORS proxy service</li>
+                        <li>Implement a serverless function (Netlify, Vercel) to handle the request</li>
+                    </ul>
+                `, 'error');
+            } else {
+                displayMessage(`A network error occurred: ${error.message}. <br> Your submission may still be processing. Please wait before submitting again.`, 'error');
+            }
         } finally {
             // Reset UI state
             loadingIndicator.style.display = 'none';
             submitButton.disabled = false;
-            submitButton.textContent = 'Submit';
             
-            // Reset debounce flag after a longer timeout that matches MIN_SUBMISSION_INTERVAL
-            // But keep the lastSubmissionTime to enforce minimum interval
-            setTimeout(() => {
-                isSubmitting = false;
-                // Don't reset lastSubmissionTime here, it's used for interval checking
-            }, 30000); // 30 seconds
-        }
-    });
-    
-    // Check for browser refresh/reload during submission
-    window.addEventListener('load', () => {
-        try {
-            const savedSubmission = localStorage.getItem('lastFormSubmission');
-            if (savedSubmission) {
-                const submissionData = JSON.parse(savedSubmission);
-                const currentTime = Date.now();
-                const timeSinceSubmission = currentTime - submissionData.timestamp;
-                
-                // If less than the minimum interval, show a warning
-                if (timeSinceSubmission < MIN_SUBMISSION_INTERVAL) {
-                    const minutesRemaining = Math.ceil((MIN_SUBMISSION_INTERVAL - timeSinceSubmission) / 60000);
-                    console.log(`Recent submission detected. ${minutesRemaining} minutes remaining before next submission.`);
-                    displayMessage(`A form was recently submitted (${Math.floor(timeSinceSubmission / 60000)} minutes ago). Please wait approximately ${minutesRemaining} more minute${minutesRemaining !== 1 ? 's' : ''} before submitting again to avoid duplicate processing.`, 'error');
-                    lastSubmissionTime = submissionData.timestamp;
-                }
-            }
-        } catch (e) {
-            console.warn("Could not process saved submission data:", e);
+            // IMPORTANT FIX: Restore original button text
+            submitButton.textContent = originalButtonText;
+            
+            // Reset the submission flag so we can submit again
+            isSubmitting = false;
         }
     });
 });
