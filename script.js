@@ -31,26 +31,26 @@ document.addEventListener('DOMContentLoaded', () => {
         "Verses": {
             title: "Verses Format",
             sections: [
-                "\"What is \\\"A\\\"?\"",
-                "\"What is \\\"B\\\"?\"",
-                "\"Answer the title\"",
+                "What is "A"",
+                "What is "B"",
+                "Answer the title",
                 "FAQ #1",
                 "FAQ #2",
                 "FAQ #3",
                 "FAQ #4",
                 "FAQ #5",
                 "FAQ #6",
-                "Section contrasting \"A\" and \"B\" (Tips/Comparison):"
+                "Section contrasting "A" and "B" (Tips/Comparison):"
             ],
             note: "This format compares two related concepts with a focus on answering the main question through contrasting elements."
         },
         "Does": {
             title: "Does Format",
             sections: [
-                "\"What is [Topic]?\"",
-                "\"What are the benefits of [Topic]\"",
-                "\"Why is it important to understand [Topic]?\"",
-                "\"Answer the title\"",
+                "What is [Topic]?",
+                "What are the benefits of [Topic]",
+                "Why is it important to understand [Topic]?",
+                "Answer the title",
                 "FAQ #1",
                 "FAQ #2",
                 "FAQ #3",
@@ -63,23 +63,23 @@ document.addEventListener('DOMContentLoaded', () => {
         "Is/Are/Can": {
             title: "Is/Are/Can Format",
             sections: [
-                "\"What is the core subject?\"",
-                "\"What are the benefits of [Topic]?\"",
-                "\"Answer the title\"",
+                "What is the core subject?",
+                "What are the benefits of [Topic]?",
+                "Answer the title",
                 "FAQ #1",
                 "FAQ #2",
                 "FAQ #3",
                 "FAQ #4",
                 "FAQ #5",
                 "FAQ #6",
-                "\"Common Mistakes OR Expert Tips for [Topic]\""
+                "Common Mistakes OR Expert Tips for [Topic]"
             ],
             note: "This format answers 'Is/Are/Can' questions with comprehensive information and practical advice."
         },
         "What Does": {
             title: "What Does Format",
             sections: [
-                "\"What is the core subject?\"",
+                "What is the core subject?",
                 "Title",
                 "FAQ #1",
                 "FAQ #2",
@@ -87,14 +87,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 "FAQ #4",
                 "FAQ #5",
                 "FAQ #6",
-                "\"Common Mistakes OR Expert Tips for [Topic]\""
+                "Common Mistakes OR Expert Tips for [Topic]"
             ],
             note: "This format explains a concept by addressing its core elements and common questions."
         },
         "5 Reasons": {
             title: "5 Reasons Format",
             sections: [
-                "\"What is the core subject?\"",
+                "What is the core subject?",
                 "Title (5 Reason breakdown)",
                 "FAQ #1",
                 "FAQ #2",
@@ -102,23 +102,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 "FAQ #4",
                 "FAQ #5",
                 "FAQ #6",
-                "\"Common Mistakes OR Expert Tips for [Topic]\""
+                "Common Mistakes OR Expert Tips for [Topic]"
             ],
             note: "This format presents five key reasons or points about the topic with supporting FAQs."
         },
         "Step-What/Why/How": {
             title: "Step-What/Why/How Format",
             sections: [
-                "\"What is [Topic]?\"",
-                "\"Why is [Topic] Important?\"",
-                "\"How to [Action]: Step-by-Step\"",
+                "What is [Topic]?",
+                "Why is [Topic] Important?",
+                "How to [Action]: Step-by-Step",
                 "FAQ #1",
                 "FAQ #2",
                 "FAQ #3",
                 "FAQ #4",
                 "FAQ #5",
                 "FAQ #6",
-                "\"Common Mistakes to Avoid When [Action]\""
+                "Common Mistakes to Avoid When [Action]"
             ],
             note: "This format addresses the what, why, and how of a topic with a structured step-by-step approach."
         }
