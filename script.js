@@ -131,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const productUrlInput = document.getElementById('productUrl');
     const articleTypeSelect = document.getElementById('articleType');
     const userInput = document.getElementById('user');
+    const solawaveCheckbox = document.getElementById('solawave');
     const submitButton = document.getElementById('submit-button');
     const loadingIndicator = document.getElementById('loading-indicator');
     const formatInfoContainer = document.getElementById('format-info');
@@ -275,7 +276,8 @@ document.addEventListener('DOMContentLoaded', () => {
             title: titleInput.value.trim(),
             productUrl: productUrlInput.value.trim(),
             articleType: articleTypeSelect.value,
-            user: userInput.value.trim()
+            user: userInput.value.trim(),
+            solawave: solawaveCheckbox.checked // Add the checkbox value (true/false)
         };
         
         // Show loading & disable button - FIX for button text overflow
@@ -291,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // GitHub Pages CORS fix - add proper headers and error handling
         try {
             console.log('Sending data to webhook:', WEBHOOK_URL);
+            console.log('Form data being sent:', formData); // Log the form data including solawave value
             const response = await fetch(WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 
