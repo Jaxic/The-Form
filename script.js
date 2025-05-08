@@ -216,16 +216,37 @@ document.addEventListener('DOMContentLoaded', () => {
         statusMessage.innerHTML = message;
     }
     
-    // Add info-message style to CSS
-    const style = document.createElement('style');
-    style.textContent = `
-        .info-message {
-            background-color: #ebf8ff;
-            color: #2b6cb0;
-            border: 1px solid #bee3f8;
-        }
-    `;
-    document.head.appendChild(style);
+    // Add info-message style to CSS if it doesn't exist
+    if (!document.querySelector('style[data-info-message-style]')) {
+        const style = document.createElement('style');
+        style.dataset.infoMessageStyle = 'true';
+        style.textContent = `
+            .info-message {
+                background-color: #ebf8ff;
+                color: #2b6cb0;
+                border: 1px solid #bee3f8;
+            }
+            
+            .submission-details {
+                margin: 10px 0;
+                padding: 10px;
+                background-color: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 6px;
+            }
+            
+            .submission-details ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .submission-details li {
+                margin-bottom: 5px;
+            }
+        `;
+        document.head.appendChild(style);
+    }
     
     // Form submission handler
     contentForm.addEventListener('submit', (event) => {
@@ -260,16 +281,9 @@ document.addEventListener('DOMContentLoaded', () => {
             solawave: solawaveCheckbox.checked
         };
         
-        // Generate a unique ID for this submission to reference in messages
+        // Generate a unique ID for this submission
         const submissionId = Date.now().toString().slice(-6); // Last 6 digits of timestamp
-        
-        // Store form data with time for reference
         const submissionTime = new Date().toLocaleTimeString();
-        const submissionDetails = {
-            id: submissionId,
-            time: submissionTime,
-            data: formData
-        };
         
         // Show loading indicator
         loadingIndicator.style.display = 'flex';
@@ -277,73 +291,108 @@ document.addEventListener('DOMContentLoaded', () => {
         const originalButtonText = submitButton.textContent || 'Submit';
         submitButton.textContent = 'Processing...';
         
-        // Use XMLHttpRequest for better control
-        const xhr = new XMLHttpRequest();
+        // Show initial status message
+        displayMessage(`
+            <p><strong>Request Submitted (ID: ${submissionId})...</strong></p>
+            <p>Your article generation request has been sent to the server.</p>
+            <p>Processing takes 5-6 minutes. You'll receive the full response when complete.</p>
+            <div class="submission-details">
+                <ul>
+                    <li><strong>Time:</strong> ${submissionTime}</li>
+                    <li><strong>Keyword:</strong> ${escapeHtml(formData.keyword)}</li>
+                    <li><strong>Title:</strong> ${escapeHtml(formData.title)}</li>
+                    <li><strong>Article Type:</strong> ${escapeHtml(formData.articleType)}</li>
+                </ul>
+            </div>
+        `, 'info');
         
-        // Set up response handling
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) { // Request is done
-                // Reset UI state immediately
+        // Set up and send the request with a 10-minute timeout
+        try {
+            // Create a Promise that will resolve when the XHR completes
+            const fetchWithLongTimeout = new Promise((resolve, reject) => {
+                // Use XMLHttpRequest for better timeout control
+                const xhr = new XMLHttpRequest();
+                
+                // Set a long timeout (10 minutes in milliseconds)
+                xhr.timeout = 10 * 60 * 1000;
+                
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            resolve({
+                                ok: true,
+                                status: xhr.status,
+                                text: xhr.responseText
+                            });
+                        } else {
+                            resolve({
+                                ok: false,
+                                status: xhr.status,
+                                text: xhr.responseText
+                            });
+                        }
+                    }
+                };
+                
+                xhr.ontimeout = function() {
+                    reject(new Error('Request timed out after 10 minutes'));
+                };
+                
+                xhr.onerror = function() {
+                    reject(new Error('Network error occurred'));
+                };
+                
+                xhr.open('POST', WEBHOOK_URL, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.send(JSON.stringify(formData));
+            });
+            
+            // Reset UI after 5 seconds to let user keep using the form
+            setTimeout(() => {
+                // Only reset UI state if we're still waiting for the response
                 loadingIndicator.style.display = 'none';
                 submitButton.disabled = false;
                 submitButton.textContent = originalButtonText;
+                
+                // Update the message to indicate waiting state
+                displayMessage(`
+                    <p><strong>Request Processing (ID: ${submissionId})...</strong></p>
+                    <p>Your article request has been submitted and is being processed.</p>
+                    <p>The server is currently generating your article (5-6 minute process).</p>
+                    <p>You can continue to use this form while waiting.</p>
+                    <div class="submission-details">
+                        <ul>
+                            <li><strong>Time:</strong> ${submissionTime}</li>
+                            <li><strong>Keyword:</strong> ${escapeHtml(formData.keyword)}</li>
+                            <li><strong>Title:</strong> ${escapeHtml(formData.title)}</li>
+                            <li><strong>Article Type:</strong> ${escapeHtml(formData.articleType)}</li>
+                        </ul>
+                    </div>
+                `, 'info');
+                
+                // Allow new submissions
                 isSubmitting = false;
                 
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    // Check if response contains "Success!"
-                    const responseText = xhr.responseText;
-                    console.log('Response received:', responseText);
-                    
-                    if (responseText.includes("Success")) {
-                        // Workflow accepted - true success
-                        displayMessage(`
-                            <p><strong>Success!</strong> Your article request has been received.</p>
-                            <p>Article generation will take 3-6 minutes to complete.</p>
-                            <p><strong>Submission Details (ID: ${submissionId}):</strong></p>
-                            <div class="submission-details">
-                                <ul>
-                                    <li><strong>Time:</strong> ${submissionTime}</li>
-                                    <li><strong>Keyword:</strong> ${escapeHtml(formData.keyword)}</li>
-                                    <li><strong>Title:</strong> ${escapeHtml(formData.title)}</li>
-                                    <li><strong>Article Type:</strong> ${escapeHtml(formData.articleType)}</li>
-                                </ul>
-                            </div>
-                        `, 'success');
-                        
-                        // Reset the form
-                        contentForm.reset();
-                        keywordInput.focus();
-                        displayFormatInfo("");
-                    } else {
-                        // Webhook responded but without expected "Success!" message
-                        displayMessage(`
-                            <p><strong>Warning:</strong> Your request was received, but the response was unexpected.</p>
-                            <p>This might indicate an issue with the workflow. The article generation may or may not proceed.</p>
-                            <p><strong>Submission Details (ID: ${submissionId}):</strong></p>
-                            <div class="submission-details">
-                                <ul>
-                                    <li><strong>Time:</strong> ${submissionTime}</li>
-                                    <li><strong>Keyword:</strong> ${escapeHtml(formData.keyword)}</li>
-                                    <li><strong>Title:</strong> ${escapeHtml(formData.title)}</li>
-                                    <li><strong>Article Type:</strong> ${escapeHtml(formData.articleType)}</li>
-                                </ul>
-                            </div>
-                            <hr>
-                            <p><strong>Response from server:</strong></p>
-                            <pre>${escapeHtml(responseText)}</pre>
-                        `, 'info');
-                    }
-                } else {
-                    // HTTP error
-                    console.error('Error response:', xhr.status, xhr.statusText, xhr.responseText);
-                    
+                // Reset the form
+                contentForm.reset();
+                keywordInput.focus();
+                displayFormatInfo("");
+                
+            }, 5000); // 5 seconds
+            
+            // Handle the response when it eventually comes (or fails)
+            fetchWithLongTimeout.then(response => {
+                console.log('Response received:', response);
+                
+                if (response.ok) {
+                    // Success
                     displayMessage(`
-                        <p><strong>Error (ID: ${submissionId}):</strong> The server returned an error.</p>
-                        <p>Status Code: ${xhr.status}</p>
-                        <p><strong>Submission Details:</strong></p>
+                        <p><strong>Success! (ID: ${submissionId})</strong></p>
+                        <p>Your article has been generated successfully.</p>
                         <div class="submission-details">
                             <ul>
-                                <li><strong>Time:</strong> ${submissionTime}</li>
+                                <li><strong>Time Submitted:</strong> ${submissionTime}</li>
+                                <li><strong>Time Completed:</strong> ${new Date().toLocaleTimeString()}</li>
                                 <li><strong>Keyword:</strong> ${escapeHtml(formData.keyword)}</li>
                                 <li><strong>Title:</strong> ${escapeHtml(formData.title)}</li>
                                 <li><strong>Article Type:</strong> ${escapeHtml(formData.articleType)}</li>
@@ -351,105 +400,52 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <hr>
                         <p><strong>Server Response:</strong></p>
-                        <pre>${escapeHtml(xhr.responseText || 'No response text')}</pre>
+                        <pre>${escapeHtml(response.text)}</pre>
+                    `, 'success');
+                } else {
+                    // Error
+                    displayMessage(`
+                        <p><strong>Error! (ID: ${submissionId})</strong></p>
+                        <p>The server returned an error response.</p>
+                        <p>Status Code: ${response.status}</p>
+                        <div class="submission-details">
+                            <ul>
+                                <li><strong>Time Submitted:</strong> ${submissionTime}</li>
+                                <li><strong>Time Failed:</strong> ${new Date().toLocaleTimeString()}</li>
+                                <li><strong>Keyword:</strong> ${escapeHtml(formData.keyword)}</li>
+                                <li><strong>Title:</strong> ${escapeHtml(formData.title)}</li>
+                                <li><strong>Article Type:</strong> ${escapeHtml(formData.articleType)}</li>
+                            </ul>
+                        </div>
+                        <hr>
+                        <p><strong>Server Response:</strong></p>
+                        <pre>${escapeHtml(response.text)}</pre>
                     `, 'error');
                 }
-            }
-        };
-        
-        // Handle network errors
-        xhr.onerror = function() {
-            console.error('Network error occurred');
-            loadingIndicator.style.display = 'none';
-            submitButton.disabled = false;
-            submitButton.textContent = originalButtonText;
-            isSubmitting = false;
-            
-            displayMessage(`
-                <p><strong>Network Error (ID: ${submissionId}):</strong> Could not connect to the server.</p>
-                <p>This could be due to CORS restrictions or network connectivity issues.</p>
-                <p><strong>Submission Details:</strong></p>
-                <div class="submission-details">
-                    <ul>
-                        <li><strong>Time:</strong> ${submissionTime}</li>
-                        <li><strong>Keyword:</strong> ${escapeHtml(formData.keyword)}</li>
-                        <li><strong>Title:</strong> ${escapeHtml(formData.title)}</li>
-                        <li><strong>Article Type:</strong> ${escapeHtml(formData.articleType)}</li>
-                    </ul>
-                </div>
-            `, 'error');
-        };
-        
-        // Handle timeouts gracefully
-        xhr.timeout = 60000; // 60 seconds timeout (adjust as needed)
-        xhr.ontimeout = function() {
-            console.log('Request timed out');
-            loadingIndicator.style.display = 'none';
-            submitButton.disabled = false;
-            submitButton.textContent = originalButtonText;
-            isSubmitting = false;
-            
-            displayMessage(`
-                <p><strong>Request Timeout (ID: ${submissionId}):</strong> The server is taking longer than expected to respond.</p>
-                <p>However, your article generation may still be in progress. The n8n workflow runs for 3-6 minutes.</p>
-                <p><strong>Submission Details:</strong></p>
-                <div class="submission-details">
-                    <ul>
-                        <li><strong>Time:</strong> ${submissionTime}</li>
-                        <li><strong>Keyword:</strong> ${escapeHtml(formData.keyword)}</li>
-                        <li><strong>Title:</strong> ${escapeHtml(formData.title)}</li>
-                        <li><strong>Article Type:</strong> ${escapeHtml(formData.articleType)}</li>
-                    </ul>
-                </div>
-            `, 'info');
-        };
-        
-        // Add submission details styling
-        const detailsStyle = document.createElement('style');
-        detailsStyle.textContent = `
-            .submission-details {
-                margin: 10px 0;
-                padding: 10px;
-                background-color: #f8fafc;
-                border: 1px solid #e2e8f0;
-                border-radius: 6px;
-            }
-            
-            .submission-details ul {
-                list-style: none;
-                padding: 0;
-                margin: 0;
-            }
-            
-            .submission-details li {
-                margin-bottom: 5px;
-            }
-        `;
-        document.head.appendChild(detailsStyle);
-        
-        // Set up and send the request
-        try {
-            // Show immediate feedback
-            displayMessage(`
-                <p><strong>Request Submitted (ID: ${submissionId})...</strong></p>
-                <p>Connecting to the server...</p>
-                <p>Please wait while we process your request.</p>
-                <div class="submission-details">
-                    <ul>
-                        <li><strong>Time:</strong> ${submissionTime}</li>
-                        <li><strong>Keyword:</strong> ${escapeHtml(formData.keyword)}</li>
-                        <li><strong>Title:</strong> ${escapeHtml(formData.title)}</li>
-                        <li><strong>Article Type:</strong> ${escapeHtml(formData.articleType)}</li>
-                    </ul>
-                </div>
-            `, 'info');
-            
-            xhr.open('POST', WEBHOOK_URL, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.send(JSON.stringify(formData));
+            }).catch(error => {
+                // Handle any errors including timeout
+                console.error('Request failed:', error);
+                
+                displayMessage(`
+                    <p><strong>Request Failed (ID: ${submissionId})</strong></p>
+                    <p>Error: ${error.message}</p>
+                    <p>The article generation may still be in progress on the server.</p>
+                    <div class="submission-details">
+                        <ul>
+                            <li><strong>Time Submitted:</strong> ${submissionTime}</li>
+                            <li><strong>Time Failed:</strong> ${new Date().toLocaleTimeString()}</li>
+                            <li><strong>Keyword:</strong> ${escapeHtml(formData.keyword)}</li>
+                            <li><strong>Title:</strong> ${escapeHtml(formData.title)}</li>
+                            <li><strong>Article Type:</strong> ${escapeHtml(formData.articleType)}</li>
+                        </ul>
+                    </div>
+                `, 'error');
+            });
             
         } catch (error) {
+            // Handle setup errors
             console.error('Error setting up the request:', error);
+            
             loadingIndicator.style.display = 'none';
             submitButton.disabled = false;
             submitButton.textContent = originalButtonText;
@@ -458,7 +454,6 @@ document.addEventListener('DOMContentLoaded', () => {
             displayMessage(`
                 <p><strong>Error (ID: ${submissionId}):</strong> ${error.message}</p>
                 <p>Could not send the request to the server.</p>
-                <p><strong>Submission Details:</strong></p>
                 <div class="submission-details">
                     <ul>
                         <li><strong>Time:</strong> ${submissionTime}</li>
