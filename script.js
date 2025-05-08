@@ -140,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Helper function to escape HTML
+    // THIS IS THE CORRECTED escapeHtml FUNCTION:
     function escapeHtml(str) {
         if (!str) return '';
         return str
