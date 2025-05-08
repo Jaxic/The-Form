@@ -126,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if elements were found
     if (!contentForm || !submitButton || !loadingIndicator || !keywordInput || !titleInput || !productUrlInput || !articleTypeSelect || !userInput || !solawaveCheckbox || !formatInfoContainer) {
         console.error('Critical DOM elements are missing! Ensure all form elements and containers exist.');
-        // Display a user-friendly error on the page if a critical element is missing
         const body = document.querySelector('body');
         if (body) {
             const errorDiv = document.createElement('div');
@@ -137,11 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
             errorDiv.style.border = '1px solid red';
             body.prepend(errorDiv);
         }
-        return; // Exit to prevent errors
+        return;
     }
 
     // Helper function to escape HTML
-    // THIS IS THE CORRECTED FUNCTION:
     function escapeHtml(str) {
         if (!str) return '';
         return str
@@ -197,9 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
         displayFormatInfo(event.target.value);
     });
 
-    displayFormatInfo(""); // Initialize with default view
+    displayFormatInfo("");
 
-    // Function to display status messages
     function displayMessage(message, type) {
         const statusMessage = document.getElementById('status-message');
         if (!statusMessage) {
@@ -208,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         statusMessage.style.display = 'block';
-        statusMessage.className = ''; // Clear existing classes
+        statusMessage.className = ''; 
 
         if (type === 'success') {
             statusMessage.classList.add('success-message');
@@ -217,10 +214,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (type === 'info') {
             statusMessage.classList.add('info-message');
         }
-        statusMessage.innerHTML = message; // Use innerHTML to render HTML content in messages
+        statusMessage.innerHTML = message;
     }
     
-    // Add info-message style to CSS if it doesn't exist
     if (!document.querySelector('style[data-info-message-style]')) {
         const style = document.createElement('style');
         style.dataset.infoMessageStyle = 'true';
@@ -230,7 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 color: #2b6cb0;
                 border: 1px solid #bee3f8;
             }
-            
             .submission-details {
                 margin: 10px 0;
                 padding: 10px;
@@ -238,13 +233,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 border: 1px solid #e2e8f0;
                 border-radius: 6px;
             }
-            
             .submission-details ul {
                 list-style: none;
                 padding: 0;
                 margin: 0;
             }
-            
             .submission-details li {
                 margin-bottom: 5px;
             }
@@ -252,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(style);
     }
 
-    // Form submission handler
     contentForm.addEventListener('submit', (event) => {
         event.preventDefault();
         console.log("Form submission triggered");
@@ -305,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const fetchWithLongTimeout = new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
-                xhr.timeout = 10 * 60 * 1000; // 10 minutes
+                xhr.timeout = 10 * 60 * 1000;
 
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4) {
@@ -349,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     `, 'success');
                     contentForm.reset();
                     keywordInput.focus();
-                    displayFormatInfo(""); // Reset format info on success
+                    displayFormatInfo("");
                 } else {
                     displayMessage(`
                         <p><strong>Error! (ID: ${submissionId})</strong></p>
@@ -386,7 +378,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `, 'error');
             }).finally(() => {
-                // This block executes whether the promise resolved or rejected
                 loadingIndicator.style.display = 'none';
                 submitButton.disabled = false;
                 submitButton.textContent = originalButtonText;
@@ -394,7 +385,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
         } catch (error) {
-            // Handle setup errors for XHR (should be rare)
             console.error('Error setting up the request:', error);
             displayMessage(`
                 <p><strong>Client-Side Error (ID: ${submissionId}):</strong> ${error.message}</p>
