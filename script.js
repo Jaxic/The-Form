@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Configuration ---
-    // Replace with your actual webhook URL
-    const WEBHOOK_URL = 'https://n8n-cors-proxy.vercel.app';
+    // Direct webhook URL - no proxy since the proxy is returning 500 errors
+    const WEBHOOK_URL = 'https://jaxic.app.n8n.cloud/webhook/feadab27-dddf-4b36-8d41-b2b06bc30d24';
     
     // Only track if a submission is in progress - no time restrictions
     let isSubmitting = false;
@@ -290,22 +290,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update button text (fixed to prevent overflow)
         submitButton.textContent = 'Processing...';
         
-        // GitHub Pages CORS fix - add proper headers and error handling
         try {
-            console.log('Sending data to webhook:', WEBHOOK_URL);
-            console.log('Form data being sent:', formData); // Log the form data including solawave value
-            const response = await fetch(WEBHOOK_URL, {
+            // Try using a different CORS proxy
+            const corsAnywhereProxy = 'https://cors-anywhere.herokuapp.com/';
+            const proxyUrl = `${corsAnywhereProxy}${WEBHOOK_URL}`;
+            
+            console.log('Sending data to webhook via alternative CORS proxy');
+            console.log('Form data being sent:', formData);
+            
+            const response = await fetch(proxyUrl, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
-                    // Add CORS headers
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type'
+                    'Origin': window.location.origin
                 },
-                body: JSON.stringify(formData),
-                // Add mode for CORS
-                mode: 'cors'
+                body: JSON.stringify(formData)
             });
 
             let responseBody = '';
@@ -318,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (response.ok) {
-                // Success handling - just show the response
+                // Success handling - show the response
                 displayMessage(
                     `<pre>${escapeHtml(responseBody)}</pre>`,
                     'success'
@@ -328,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Reset the format info display
                 displayFormatInfo("");
             } else {
-                // Error handling - just show the response
+                // Error handling - show the response
                 displayMessage(
                     `<pre>${escapeHtml(responseBody)}</pre>`,
                     'error'
@@ -338,23 +337,19 @@ document.addEventListener('DOMContentLoaded', () => {
             // Network error handling
             console.error('Network or fetch error:', error);
             
-            // Improved error handling for GitHub Pages CORS issues
-            if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
-                displayMessage(`
-                    <strong>CORS Error:</strong> The browser blocked the request due to cross-origin restrictions. 
-                    <br><br>
-                    This is likely because GitHub Pages cannot directly communicate with your webhook. 
-                    <br><br>
-                    Possible solutions:
-                    <ul>
-                        <li>Configure your webhook server to allow requests from your GitHub Pages domain</li>
-                        <li>Use a CORS proxy service</li>
-                        <li>Implement a serverless function (Netlify, Vercel) to handle the request</li>
-                    </ul>
-                `, 'error');
-            } else {
-                displayMessage(`A network error occurred: ${error.message}. <br> Your submission may still be processing. Please wait before submitting again.`, 'error');
-            }
+            displayMessage(`
+                <strong>CORS Error Detected:</strong> ${error.message}
+                <br><br>
+                It seems our CORS proxy is experiencing issues. As an alternative, consider:
+                <br><br>
+                1. Try a different browser or disable CORS checks temporarily (for testing only)
+                <br>
+                2. Install a CORS-disabling browser extension like "CORS Unblock" for Chrome
+                <br>
+                3. Use your form data directly in n8n by copying this information:
+                <br><br>
+                <pre>${escapeHtml(JSON.stringify(formData, null, 2))}</pre>
+            `, 'error');
         } finally {
             // Reset UI state
             loadingIndicator.style.display = 'none';
