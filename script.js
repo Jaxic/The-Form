@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Configuration ---
-    // Direct webhook URL - no proxy since the proxy is returning 500 errors
+    // Direct webhook URL - working directly without a proxy
     const WEBHOOK_URL = 'https://jaxic.app.n8n.cloud/webhook/feadab27-dddf-4b36-8d41-b2b06bc30d24';
     
     // Only track if a submission is in progress - no time restrictions
@@ -291,18 +291,14 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.textContent = 'Processing...';
         
         try {
-            // Try using a different CORS proxy
-            const corsAnywhereProxy = 'https://cors-anywhere.herokuapp.com/';
-            const proxyUrl = `${corsAnywhereProxy}${WEBHOOK_URL}`;
-            
-            console.log('Sending data to webhook via alternative CORS proxy');
+            // Direct connection to n8n webhook
+            console.log('Sending data directly to n8n webhook');
             console.log('Form data being sent:', formData);
             
-            const response = await fetch(proxyUrl, {
+            const response = await fetch(WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 
-                    'Content-Type': 'application/json',
-                    'Origin': window.location.origin
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(formData)
             });
@@ -338,17 +334,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Network or fetch error:', error);
             
             displayMessage(`
-                <strong>CORS Error Detected:</strong> ${error.message}
+                <strong>Error:</strong> ${error.message} 
                 <br><br>
-                It seems our CORS proxy is experiencing issues. As an alternative, consider:
-                <br><br>
-                1. Try a different browser or disable CORS checks temporarily (for testing only)
-                <br>
-                2. Install a CORS-disabling browser extension like "CORS Unblock" for Chrome
-                <br>
-                3. Use your form data directly in n8n by copying this information:
-                <br><br>
-                <pre>${escapeHtml(JSON.stringify(formData, null, 2))}</pre>
+                There was a problem communicating with the webhook.
             `, 'error');
         } finally {
             // Reset UI state
