@@ -2,13 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Configuration ---
     // n8n webhook URL
     const WEBHOOK_URL = 'https://jaxic.app.n8n.cloud/webhook/feadab27-dddf-4b36-8d41-b2b06bc30d24';
-    
+
     // Only track if a submission is in progress
     let isSubmitting = false;
-    
+
     // Enable logging for debugging
     console.log("Content form script loaded successfully");
-    
+
     // Format information for each article type
     const formatInfo = {
         "Step-by-Step": {
@@ -122,29 +122,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitButton = document.getElementById('submit-button');
     const loadingIndicator = document.getElementById('loading-indicator');
     const formatInfoContainer = document.getElementById('format-info');
-    
+
     // Check if elements were found
-    if (!contentForm || !submitButton || !loadingIndicator) {
-        console.error('Critical DOM elements are missing!');
+    if (!contentForm || !submitButton || !loadingIndicator || !keywordInput || !titleInput || !productUrlInput || !articleTypeSelect || !userInput || !solawaveCheckbox || !formatInfoContainer) {
+        console.error('Critical DOM elements are missing! Ensure all form elements and containers exist.');
+        // Display a user-friendly error on the page if a critical element is missing
+        const body = document.querySelector('body');
+        if (body) {
+            const errorDiv = document.createElement('div');
+            errorDiv.textContent = 'Error: A critical page element is missing. The form cannot operate. Please contact support.';
+            errorDiv.style.color = 'red';
+            errorDiv.style.padding = '20px';
+            errorDiv.style.backgroundColor = '#ffe0e0';
+            errorDiv.style.border = '1px solid red';
+            body.prepend(errorDiv);
+        }
         return; // Exit to prevent errors
     }
-    
+
     // Helper function to escape HTML
     function escapeHtml(str) {
         if (!str) return '';
         return str
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+            .replace(/&/g, "&")
+            .replace(/</g, "<")
+            .replace(/>/g, ">")
+            .replace(/"/g, """)
+            .replace(/'/g, "'");
     }
-    
+
     // Function to display format information
     function displayFormatInfo(articleType) {
         const info = formatInfo[articleType];
-        
-        // If no format information is available, show default message
+
         if (!info) {
             formatInfoContainer.innerHTML = `
                 <div class="format-header">
@@ -157,8 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             return;
         }
-        
-        // Build the HTML for the format info
+
         let html = `
             <div class="format-header">
                 <h3>Article Format</h3>
@@ -168,12 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p class="format-type-title">${info.title}</p>
                 <ul class="format-sections">
         `;
-        
-        // Add each section as a list item
+
         info.sections.forEach(section => {
             html += `<li>${section}</li>`;
         });
-        
+
         html += `
                 </ul>
                 <div class="format-note">
@@ -181,19 +189,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
-        
-        // Update the container
         formatInfoContainer.innerHTML = html;
     }
-    
-    // Event listener for article type selection
+
     articleTypeSelect.addEventListener('change', (event) => {
         displayFormatInfo(event.target.value);
     });
-    
-    // Initialize with default view
-    displayFormatInfo("");
-    
+
+    displayFormatInfo(""); // Initialize with default view
+
     // Function to display status messages
     function displayMessage(message, type) {
         const statusMessage = document.getElementById('status-message');
@@ -201,10 +205,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Status message element not found!');
             return;
         }
-        
+
         statusMessage.style.display = 'block';
-        statusMessage.className = '';
-        
+        statusMessage.className = ''; // Clear existing classes
+
         if (type === 'success') {
             statusMessage.classList.add('success-message');
         } else if (type === 'error') {
@@ -212,8 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (type === 'info') {
             statusMessage.classList.add('info-message');
         }
-        
-        statusMessage.innerHTML = message;
+        statusMessage.innerHTML = message; // Use innerHTML to render HTML content in messages
     }
     
     // Add info-message style to CSS if it doesn't exist
@@ -247,31 +250,26 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         document.head.appendChild(style);
     }
-    
+
     // Form submission handler
     contentForm.addEventListener('submit', (event) => {
         event.preventDefault();
         console.log("Form submission triggered");
-        
-        // Prevent multiple submissions
+
         if (isSubmitting) {
             console.log("Form submission already in progress, ignoring this click");
-            displayMessage("A submission is already in progress. Please wait.", 'error');
+            displayMessage("A submission is already in progress. Please wait for it to complete.", 'error');
             return;
         }
-        
-        // Set the debounce flag
         isSubmitting = true;
-        
-        // UI preparation
-        const statusMessage = document.getElementById('status-message');
-        if (statusMessage) {
-            statusMessage.textContent = '';
-            statusMessage.style.display = 'none';
-            statusMessage.className = '';
+
+        const statusMessageEl = document.getElementById('status-message');
+        if (statusMessageEl) {
+            statusMessageEl.textContent = '';
+            statusMessageEl.style.display = 'none';
+            statusMessageEl.className = '';
         }
-        
-        // Prepare the form data
+
         const formData = {
             keyword: keywordInput.value.trim(),
             title: titleInput.value.trim(),
@@ -280,22 +278,19 @@ document.addEventListener('DOMContentLoaded', () => {
             user: userInput.value.trim(),
             solawave: solawaveCheckbox.checked
         };
-        
-        // Generate a unique ID for this submission
-        const submissionId = Date.now().toString().slice(-6); // Last 6 digits of timestamp
+
+        const submissionId = Date.now().toString().slice(-6);
         const submissionTime = new Date().toLocaleTimeString();
-        
-        // Show loading indicator
+
         loadingIndicator.style.display = 'flex';
         submitButton.disabled = true;
         const originalButtonText = submitButton.textContent || 'Submit';
-        submitButton.textContent = 'Processing...';
-        
-        // Show initial status message
+        submitButton.textContent = 'Processing... Please Wait';
+
         displayMessage(`
             <p><strong>Request Submitted (ID: ${submissionId})...</strong></p>
-            <p>Your article generation request has been sent to the server.</p>
-            <p>Processing takes 5-6 minutes. You'll receive the full response when complete.</p>
+            <p>Your article generation request is being processed by the server.</p>
+            <p>This may take 5-10 minutes. Please wait for the response before submitting again.</p>
             <div class="submission-details">
                 <ul>
                     <li><strong>Time:</strong> ${submissionTime}</li>
@@ -305,87 +300,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 </ul>
             </div>
         `, 'info');
-        
-        // Set up and send the request with a 10-minute timeout
+
         try {
-            // Create a Promise that will resolve when the XHR completes
             const fetchWithLongTimeout = new Promise((resolve, reject) => {
-                // Use XMLHttpRequest for better timeout control
                 const xhr = new XMLHttpRequest();
-                
-                // Set a long timeout (10 minutes in milliseconds)
-                xhr.timeout = 10 * 60 * 1000;
-                
+                xhr.timeout = 10 * 60 * 1000; // 10 minutes
+
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4) {
-                        if (xhr.status >= 200 && xhr.status < 300) {
-                            resolve({
-                                ok: true,
-                                status: xhr.status,
-                                text: xhr.responseText
-                            });
-                        } else {
-                            resolve({
-                                ok: false,
-                                status: xhr.status,
-                                text: xhr.responseText
-                            });
-                        }
+                        resolve({
+                            ok: xhr.status >= 200 && xhr.status < 300,
+                            status: xhr.status,
+                            text: xhr.responseText
+                        });
                     }
                 };
-                
                 xhr.ontimeout = function() {
                     reject(new Error('Request timed out after 10 minutes'));
                 };
-                
                 xhr.onerror = function() {
                     reject(new Error('Network error occurred'));
                 };
-                
+
                 xhr.open('POST', WEBHOOK_URL, true);
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 xhr.send(JSON.stringify(formData));
             });
-            
-            // Reset UI after 5 seconds to let user keep using the form
-            setTimeout(() => {
-                // Only reset UI state if we're still waiting for the response
-                loadingIndicator.style.display = 'none';
-                submitButton.disabled = false;
-                submitButton.textContent = originalButtonText;
-                
-                // Update the message to indicate waiting state
-                displayMessage(`
-                    <p><strong>Request Processing (ID: ${submissionId})...</strong></p>
-                    <p>Your article request has been submitted and is being processed.</p>
-                    <p>The server is currently generating your article (5-6 minute process).</p>
-                    <p>You can continue to use this form while waiting.</p>
-                    <div class="submission-details">
-                        <ul>
-                            <li><strong>Time:</strong> ${submissionTime}</li>
-                            <li><strong>Keyword:</strong> ${escapeHtml(formData.keyword)}</li>
-                            <li><strong>Title:</strong> ${escapeHtml(formData.title)}</li>
-                            <li><strong>Article Type:</strong> ${escapeHtml(formData.articleType)}</li>
-                        </ul>
-                    </div>
-                `, 'info');
-                
-                // Allow new submissions
-                isSubmitting = false;
-                
-                // Reset the form
-                contentForm.reset();
-                keywordInput.focus();
-                displayFormatInfo("");
-                
-            }, 5000); // 5 seconds
-            
-            // Handle the response when it eventually comes (or fails)
+
             fetchWithLongTimeout.then(response => {
                 console.log('Response received:', response);
-                
                 if (response.ok) {
-                    // Success
                     displayMessage(`
                         <p><strong>Success! (ID: ${submissionId})</strong></p>
                         <p>Your article has been generated successfully.</p>
@@ -402,8 +346,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <p><strong>Server Response:</strong></p>
                         <pre>${escapeHtml(response.text)}</pre>
                     `, 'success');
+                    contentForm.reset();
+                    keywordInput.focus();
+                    displayFormatInfo(""); // Reset format info on success
                 } else {
-                    // Error
                     displayMessage(`
                         <p><strong>Error! (ID: ${submissionId})</strong></p>
                         <p>The server returned an error response.</p>
@@ -423,13 +369,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     `, 'error');
                 }
             }).catch(error => {
-                // Handle any errors including timeout
                 console.error('Request failed:', error);
-                
                 displayMessage(`
                     <p><strong>Request Failed (ID: ${submissionId})</strong></p>
                     <p>Error: ${error.message}</p>
-                    <p>The article generation may still be in progress on the server.</p>
+                    <p>The article generation may still be in progress on the server if this was a timeout or network issue on the client side.</p>
                     <div class="submission-details">
                         <ul>
                             <li><strong>Time Submitted:</strong> ${submissionTime}</li>
@@ -440,20 +384,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         </ul>
                     </div>
                 `, 'error');
+            }).finally(() => {
+                // This block executes whether the promise resolved or rejected
+                loadingIndicator.style.display = 'none';
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
+                isSubmitting = false;
             });
-            
+
         } catch (error) {
-            // Handle setup errors
+            // Handle setup errors for XHR (should be rare)
             console.error('Error setting up the request:', error);
-            
-            loadingIndicator.style.display = 'none';
-            submitButton.disabled = false;
-            submitButton.textContent = originalButtonText;
-            isSubmitting = false;
-            
             displayMessage(`
-                <p><strong>Error (ID: ${submissionId}):</strong> ${error.message}</p>
-                <p>Could not send the request to the server.</p>
+                <p><strong>Client-Side Error (ID: ${submissionId}):</strong> ${error.message}</p>
+                <p>Could not send the request to the server. Please check your connection or contact support.</p>
                 <div class="submission-details">
                     <ul>
                         <li><strong>Time:</strong> ${submissionTime}</li>
@@ -463,6 +407,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     </ul>
                 </div>
             `, 'error');
+            
+            loadingIndicator.style.display = 'none';
+            submitButton.disabled = false;
+            submitButton.textContent = originalButtonText;
+            isSubmitting = false;
         }
     });
 });
